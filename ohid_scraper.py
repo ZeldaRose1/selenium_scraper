@@ -6,6 +6,9 @@ Created on Wed Jan 29 08:57:52 2025
 @author: zelda
 """
 
+import time
+import os
+
 import selenium
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
@@ -14,7 +17,15 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-import time
+if os.path.isfile("auth.txt"):
+    try:
+        f = open("auth.txt", 'r')
+        un = f.readline().split(":")[1].split("\\")[0]
+        pw = f.readline().split(":")[1].split("\\")[0]
+    except:
+        un = input("Please input username:\t\t")
+        pw = input("Please input password:\t\t")
+
 
 # Initialize service object with Firefox driver
 service = Service(
@@ -34,12 +45,12 @@ WebDriverWait(driver, 5).until(
 # Find username and password fields
 uname = driver.find_element(By.ID, "loginUserID")
 uname.clear()
-uname.send_keys("Lalexander10")
+uname.send_keys(un)
 
 # Find password field
 passwd = driver.find_element(By.ID, "loginPassword")
 passwd.clear()
-passwd.send_keys("P@55word2024" + Keys.ENTER)
+passwd.send_keys(pw + Keys.ENTER)
 
 
 # Wait for 10 seconds and close browser
