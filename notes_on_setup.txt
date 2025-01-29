@@ -1,0 +1,13 @@
+1. Install selenium with pip
+	python3 -m pip install selenium
+
+2. Install Firefox or Chrome driver
+	https://github.com/mozilla/geckodriver/
+	sites.google.com/chromium.org/driver/
+
+	Download the most updated driver file and then unzip it into the same folder
+	as the .py file you're using selenium with
+
+	I could not get this to work with Chromium, but I was able to make Firefox work
+	after I uninstalled the snap package and reinstalled from a .deb package.
+		No clue why this works, but it did.
