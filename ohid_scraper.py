@@ -17,19 +17,31 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+# Read in username and password from auth.txt file
 if os.path.isfile("auth.txt"):
     try:
         f = open("auth.txt", 'r')
-        un = f.readline().split(":")[1].split("\\")[0]
-        pw = f.readline().split(":")[1].split("\\")[0]
-    except:
+
+        for lin in f:
+            if lin.split(":")[0] == 'username':
+                un = lin.split(":")[1].split("\n")[0]
+            if lin.split(":")[0] == 'password':
+                pw = lin.split(":")[1].split("\n")[0]
+
+    except Exception as e:
+        # If there is no username and password in the text file
+        # request data form user
+        print(e)
         un = input("Please input username:\t\t")
         pw = input("Please input password:\t\t")
+    finally:
+        # Close file to free memory
+        f.close()
 
 
 # Initialize service object with Firefox driver
 service = Service(
-    executable_path=r"/data/Books/projects/web_scraping/password_test/geckodriver"
+    executable_path=r"./geckodriver"
 )
 # Initialize Firefox instance with service
 driver = webdriver.Firefox(service=service)
@@ -52,19 +64,18 @@ passwd = driver.find_element(By.ID, "loginPassword")
 passwd.clear()
 passwd.send_keys(pw + Keys.ENTER)
 
+# Clean memory
+del un, pw
 
-# Wait for 10 seconds and close browser
-time.sleep(10)
-# driver.close()
+# Save variable for xpath
+oepa_x = "//div[@data-app-id='4ec93658-bb94-43f3-b02b-aeab5f025743']"
+oepa_x += "//div[contains(a, 'Open App')]/a"
 
+# Wait until website loads
+WebDriverWait(driver, 15).until(
+    EC.presence_of_element_located((By.XPATH, oepa_x))
+)
 
-
-# # Load website
-# driver.get("https://orteil.dashnet.org/cookieclicker/")
-
-# # Save id to search for
-# cookie_id = "bigCookie"
-
-# # Move cursor to big cookie and click it.
-# cookie = driver.find_element(By.ID, cookie_id)
-# cookie.click()
+# Load next web page
+page2 = driver.find_element(By.XPATH, oepa_x)
+page2.click()
