@@ -79,3 +79,92 @@ WebDriverWait(driver, 15).until(
 # Load next web page
 page2 = driver.find_element(By.XPATH, oepa_x)
 page2.click()
+
+# Move selenium's focus to new tab after saving initial tab
+init_tab = driver.current_window_handle
+for h in driver.window_handles:
+    if h != init_tab:
+        driver.switch_to.window(h)
+        break
+
+# Wait until website loads
+WebDriverWait(driver, 30).until(
+    EC.presence_of_element_located((By.ID, "DAPC"))
+)
+
+# Load next web page
+airs = driver.find_element(By.ID, "DAPC")
+airs.click()
+
+# Wait until website loads
+WebDriverWait(driver, 30).until(
+    EC.presence_of_element_located((By.CLASS_NAME, "paneltext"))
+)
+
+# Pull list of wells that we need to pull data from
+# Set xpath
+well_x = "//table/tbody/tr[@class='paneltext']//"
+well_x += "a[@class='navlink']"
+well_list = driver.find_elements(By.XPATH, well_x)
+wl2 = [x for x in well_list if "" != x.text]
+h = wl2[0]
+
+# Save main tab handle
+main_url = driver.current_url
+
+# Start processing wells by loop
+for i in range(len(wl2)):
+    if i != 0:
+        # Wait until website loads
+        WebDriverWait(driver, 30).until(
+            EC.presence_of_element_located((By.ID, "DAPC"))
+        )
+
+        # Load next web page
+        airs = driver.find_element(By.ID, "DAPC")
+        airs.click()
+
+        # Wait until website loads
+        WebDriverWait(driver, 30).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "paneltext"))
+        )
+
+        # Pull list of wells that we need to pull data from
+        # Set xpath
+        well_list = driver.find_elements(By.XPATH, well_x)
+        wl2 = [x for x in well_list if "" != x.text]
+        h = wl2[i]
+
+    # Navigate to well page
+    h.click()
+
+    # Wait until website loads
+    WebDriverWait(driver, 30).until(
+        EC.presence_of_element_located((By.XPATH, "//iframe"))
+    )
+    # Change focus to iframe
+    iframe = driver.find_element(By.XPATH, "//iframe")
+    driver.switch_to.frame(iframe)
+
+    # Wait until website loads
+    WebDriverWait(driver, 30).until(
+        EC.presence_of_element_located((By.XPATH, "//td[contains(a, 'Permit(s)')]/a"))
+    )
+    # Navigate to well specific permit page
+    permit = driver.find_element(By.XPATH, "//td[contains(a, 'Permit(s)')]/a")
+    permit.click()
+
+    # Wait until website loads
+    WebDriverWait(driver, 30).until(
+        EC.presence_of_element_located((By.XPATH, "//a[contains(span, 'Final PTIO')]"))
+    )
+    # Change focus to iframe
+    # iframe = driver.find_element(By.XPATH, "///a[contains(span, 'Final PTIO')]")
+    # driver.switch_to.frame(iframe)
+
+    # Select element that has the download
+    download_link = driver.find_element(By.XPATH, "//a[contains(span, 'Final PTIO')]")
+    download_link.click()
+
+    # Return to main page:
+    driver.get(main_url)
